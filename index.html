@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martian - Home</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Audiowide&family=Roboto:wght@300;400;500&display=swap">
+    <link rel="stylesheet" href="mainpage.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Starry Night Background -->
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="clouds"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo-title">
+            <span class="logo">🪐</span>
+            <span class="site-title">MARTIAN</span>
+            <span class="year">2025</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><button id="themeToggle" class="nav-btn"><span>🌓</span> Theme</button></li>
+            <li class="nav-item"><button id="profileBtn" class="nav-btn"><span>👤</span> Profile</button></li>
+            <li class="nav-item"><button id="logoutBtn" class="nav-btn logout-btn"><span>🚪</span> Logout</button></li>
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <!-- User Greeting -->
+    <h1 id="userGreeting" class="greeting-type">Hi, Martian! 🚀</h1>
+
+    <!-- Main Content Grid -->
+    <div class="mainpage-grid">
+        <!-- Announcements Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">📢</span> Live Announcements</h2>
+            <div class="announcements-controls">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="today">Today</button>
+                <button class="filter-btn" data-filter="high">High Priority</button>
+            </div>
+            <div id="announcementsFeed" class="announcements-feed"></div>
+        </div>
+
+        <!-- Schedule Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">📅</span> Upcoming Schedule</h2>
+            <div class="subsection-btn-group">
+                <button class="sub-btn" data-sub="A1">A1</button>
+                <button class="sub-btn" data-sub="A2">A2</button>
+                <button class="sub-btn" data-sub="A3">A3</button>
+            </div>
+            <div id="scheduleTimeline" class="schedule-timeline"></div>
+        </div>
+
+        <!-- SGPA Upload & Ranking Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">📊</span> Academic Performance</h2>
+            <div class="sgpa-upload-section">
+                <div class="semester-selector">
+                    <label for="semesterSelect">Select Semester:</label>
+                    <select id="semesterSelect" class="semester-dropdown">
+                        <option value="">Choose Semester</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+                <div class="sgpa-input-section">
+                    <label for="sgpaInput">Enter SGPA:</label>
+                    <input type="number" id="sgpaInput" class="sgpa-input" min="0" max="10" step="0.01" placeholder="0.00">
+                    <button id="uploadSgpaBtn" class="upload-btn">Upload SGPA</button>
+                </div>
+                <div class="performance-display">
+                    <div class="cgpa-display">
+                        <span class="cgpa-label">Current CGPA:</span>
+                        <span id="cgpaValue" class="cgpa-value">--</span>
+                    </div>
+                    <div class="rank-display">
+                        <span class="rank-label">Your Rank:</span>
+                        <span id="rankValue" class="rank-value">--</span>
+                    </div>
+                </div>
+                <div class="performance-graph-container">
+                    <canvas id="performanceGraph" class="performance-graph"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- LinkedIn Connect Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header">
+                <span class="mp-icon">💼</span> 
+                Connect with Classmates
+                <a href="https://linkedin.com" target="_blank" class="linkedin-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#0077b5">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+            </h2>
+            <div class="linkedin-suggestions">
+                <div class="suggestions-header">
+                    <p>Connect with your classmates on LinkedIn</p>
+                </div>
+                <div id="linkedinSuggestions" class="linkedin-profiles">
+                    <!-- LinkedIn suggestions will be loaded here -->
+                </div>
+                <button id="refreshSuggestions" class="refresh-btn">Refresh Suggestions</button>
+            </div>
+        </div>
+
+        <!-- Resources Card -->
+        <div class="mp-card float-card resources-section">
+            <h2 class="mp-card-header"><span class="mp-icon">📚</span> Resources</h2>
+            <ul id="resourcesList" class="resources-list"></ul>
+            <button id="resourcesShowMore" class="show-more-btn">Show More</button>
+            <button class="view-all-btn">View All</button>
+        </div>
+
+        <!-- Gallery Card -->
+        <div class="mp-card float-card gallery-section">
+            <h2 class="mp-card-header"><span class="mp-icon">🖼️</span> Gallery</h2>
+            <div class="gallery-grid-preview" id="galleryGrid"></div>
+            <button id="galleryShowMore" class="show-more-btn">Show More</button>
+            <button class="view-all-btn">View All</button>
+        </div>
+
+        <!-- Events Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">🎯</span> Events</h2>
+            <div id="eventCountdown" class="event-countdown"></div>
+            <div id="eventsList" class="events-list"></div>
+        </div>
+
+        <!-- Polls Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">📊</span> Class Polls</h2>
+            <div id="pollsContainer" class="polls-container">
+                <!-- Polls will be loaded here dynamically -->
+                <div class="loading-message">Loading polls...</div>
+            </div>
+        </div>
+
+        <!-- Knowledge Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">🧠</span> Martian Daily Knowledge</h2>
+            <div class="bubble-content" id="knowledgeBubble">
+                Mars has a thin atmosphere composed mainly of carbon dioxide. The planet's surface features valleys, deserts, and polar ice caps, and it has two small moons: Phobos and Deimos.
+            </div>
+        </div>
+
+        <!-- Projects Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">🛠️</span> Projects & Clubs</h2>
+            <div class="projects-grid" id="projectsGrid"></div>
+        </div>
+
+        <!-- Weather Card -->
+        <div class="mp-card float-card">
+            <h2 class="mp-card-header"><span class="mp-icon">☀️</span> Martian Weather</h2>
+            <div class="weather-widget">
+                <div class="weather-icon">🌡️</div>
+                <div class="weather-info">
+                    <div class="weather-temp">-63°C</div>
+                    <div class="weather-desc">Dust storms expected in Acidalia Planitia</div>
+                    <div class="weather-wind">Wind: 25 km/h</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <button class="footer-btn">About</button>
+            <button class="footer-btn">Contact</button>
+            <button class="footer-btn">Help</button>
+        </div>
+        <div class="footer-credit">MARTIAN © 2025</div>
+    </footer>
+
+    <script src="mainpage.js"></script>
+</body>
+</html>
